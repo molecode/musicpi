@@ -1,0 +1,28 @@
+---
+
+- hosts: musicpi
+  become: yes
+  tasks:
+  - name: Set volume to 70%
+    shell: amixer sset Digital 70%
+  - name: Add raspotify GPG key
+    apt_key:
+      url: https://dtcooper.github.io/raspotify/key.asc
+      state: present
+  - name: Add raspotify repo
+    apt_repository:
+      repo: deb https://dtcooper.github.io/raspotify jessie main
+      state: present
+  - name: Install raspotify
+    apt:
+      name: "{{ packages }}"
+      update_cache: yes
+    vars:
+      packages:
+        - raspotify
+        - curl
+        - apt-transport-https
+  - name: Start raspotify service
+    shell: systemctl start raspotify
+  - name: Enable raspotify service to start on startup
+    shell: systemctl enable raspotify

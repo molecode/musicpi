@@ -1,0 +1,53 @@
+---
+
+- hosts: musicpi
+  become: yes
+  vars:
+    upgrade_system: yes
+    update_cache: yes
+  tasks:
+  - name: Install base packages
+    apt:
+      name: "{{ packages }}"
+      update_cache: "{{ update_cache }}"
+    vars:
+      packages:
+        - htop
+        - vim
+        - tmux
+  - name: Insert shikoku wifi network
+    blockinfile:
+      dest: /etc/wpa_supplicant/wpa_supplicant.conf
+      block: |
+        network={
+          ssid="shikoku"
+          psk="SeCrEtWiFiPaSsWoRd"
+          key_mgmt=WPA-PSK
+        } 
+  - name: Copy interfaces to remote host 
+    copy:
+      src: files/interfaces
+      dest: /etc/network/interfaces
+      owner: root
+      group: root
+      mode: 0644 
+      backup: yes
+  - name: DAC+ Remove the driver for the onboard sound
+    replace: 
+      dest: /boot/config.txt
+      regexp: '^dtparam=audio=on$'
+      replace: '#dtparam=audio=on'
+  - name: DAC+ Configure device tree overlay file
+    lineinfile:
+      dest: /boot/config.txt
+      regexp: '^dtoverlay=hifiberry-dacplus$'
+      line: 'dtoverlay=hifiberry-dacplus'
+  - name: DAC+ Configure ALSA
+    copy:
+      src: files/asound.conf
+      dest: /etc/asound.conf
+      owner: root
+      group: root
+      mode: 0644
+  - name: Reboot pi
+    shell: reboot

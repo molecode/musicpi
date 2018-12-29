@@ -1,0 +1,30 @@
+---
+
+- hosts: musicpi
+  become: yes
+  tasks:
+  - name: Install mpd
+    apt: name=mpd state=installed update_cache=yes
+  - name: Add diskstation to fstab
+    mount:
+      name: /media/music
+      src: //192.168.0.3/music/Musik
+      fstype: cifs
+      state: mounted
+      opts: guest,iocharset=utf8
+  - name: Copy mpd config file to remote host
+    copy: 
+      src: files/mpd.conf
+      dest: /etc/mpd.conf
+      owner: mpd
+      group: audio
+      mode: 0640
+      backup: yes
+    notify: restart mpd
+  - name: Start mpd service
+    shell: systemctl start mpd 
+  - name: Enable mpd service to start on startup
+    shell: systemctl enable mpd
+  handlers:
+    - name: restart mpd
+      shell: systemctl restart mpd
