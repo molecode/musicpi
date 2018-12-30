@@ -22,7 +22,7 @@
       backup: yes
     notify: restart mpd
   - name: Start mpd service
-    shell: systemctl start mpd 
+    shell: systemctl start mpd
   - name: Enable mpd service to start on startup
     shell: systemctl enable mpd
   handlers:

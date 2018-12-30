@@ -23,14 +23,14 @@
           ssid="shikoku"
           psk="SeCrEtWiFiPaSsWoRd"
           key_mgmt=WPA-PSK
-        } 
+        }
   - name: Copy interfaces to remote host 
     copy:
       src: files/interfaces
       dest: /etc/network/interfaces
       owner: root
       group: root
-      mode: 0644 
+      mode: 0644
       backup: yes
   - name: DAC+ Remove the driver for the onboard sound
     replace: 
